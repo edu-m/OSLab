@@ -1,0 +1,7 @@
+macuna:10
+martinaGoldie:20
+martinaFideli:30
+AlessiaUCC:25
+Marilu:10
+matteoCops:17
+GiadaInco:90
