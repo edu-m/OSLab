@@ -26,8 +26,9 @@ typedef struct nodo
 void inserisciInTesta(Nodo **testa, char *nome, int valore)
 {
     Nodo *nuovoNodo = (Nodo *)(malloc(sizeof(Nodo)));
-    strncpy(nuovoNodo->nome, nome, sizeof(nome));
+    strncpy(nuovoNodo->nome, nome, strlen(nome) + 1);
     nuovoNodo->next = NULL;
+    nuovoNodo->valore = valore;
 
     if (testa == NULL)
         *testa = nuovoNodo;
@@ -50,6 +51,49 @@ bool doesFileExist(char *file)
 {
     struct stat fileStat;
     return !(stat(file, &fileStat) || !S_ISREG(fileStat.st_mode));
+}
+
+void out(int q)
+{
+    Messaggio msgRcv;
+    int counterIN1 = 0;
+    int counterIN2 = 0;
+    int sommaIN1 = 0;
+    int sommaIN2 = 0;
+
+    char *nome;
+    char *valore;
+    char *id;
+
+    while (1)
+    {
+        msgrcv(q, &msgRcv, sizeof(msgRcv) - sizeof(long), 0, 0);
+        nome = strtok(msgRcv.data, ",");
+        valore = strtok(NULL, ",");
+        id = strtok(NULL, "\n");
+
+        if (strcmp(nome, "finito"))
+        {
+            printf("Ricevuto finito!\n");
+            break;
+        }
+
+        if (atoi(id) == 1)
+        {
+            printf("incremento IN1\n");
+            counterIN1++;
+            sommaIN1 += atoi(valore);
+        }
+        else
+        {
+            printf("incremento IN2\n");
+            counterIN2++;
+            sommaIN2 += atoi(valore);
+        }
+    }
+    msgctl(q, IPC_RMID, NULL);
+    printf("OUT: ricevuti n.%d valori validi per IN1 con totale %d\n", counterIN1, sommaIN1);
+    printf("OUT: ricevuti n.%d valori validi per IN2 con totale %d\n", counterIN2, sommaIN2);
 }
 
 void in(char *file, int q, int id)
@@ -82,6 +126,14 @@ void in(char *file, int q, int id)
     msgsnd(q, messaggio, strlen(messaggio->data) + 1, IPC_NOWAIT);
 }
 
+Nodo *trovaInLista(Nodo *testa, char *nomeRicevuto, int idRicevuto)
+{
+    for (Nodo *temp = testa; temp != NULL; temp = temp->next)
+        if (strcmp(nomeRicevuto, temp->nome) == 0)
+            return temp;
+    return NULL;
+}
+
 void db(char *file, int q1, int q2)
 {
     if (!doesFileExist(file))
@@ -95,18 +147,21 @@ void db(char *file, int q1, int q2)
     FILE *query = fopen(file, "r");
     char line[BUF_SIZE];
     Messaggio messaggioInput;
-
+    Messaggio *messaggioOutput;
+    int numOfLines = 0;
     while (!feof(query))
     {
         fgets(line, BUF_SIZE, query);
         nome = strtok(line, ":");
         valore = atoi(strtok(NULL, "\n"));
         inserisciInTesta(&testa, nome, valore);
+        ++numOfLines;
     }
-
+    // printf("DB: letti n. %d record da file\n", numOfLines);
     bool eof[2] = {false};
     int idRicevuto;
     char *nomeRicevuto;
+    char buffer[BUF_SIZE];
     while (!eof[0] || !eof[1])
     {
         msgrcv(q1, &messaggioInput, sizeof(messaggioInput) - sizeof(long), 0, 0);
@@ -115,7 +170,29 @@ void db(char *file, int q1, int q2)
         if (strcmp(nomeRicevuto, "finito") == 0)
             eof[idRicevuto - 1] = true;
         else
-            printf("%d %s\n", idRicevuto, nomeRicevuto);
+        { // procedo con la ricerca in struttura dati
+            Nodo *cercato = trovaInLista(testa, nomeRicevuto, idRicevuto);
+            if (cercato != NULL)
+            {
+                printf("DB: query '%s' da IN%d trovata con valore %d\n", nomeRicevuto, idRicevuto, cercato->valore);
+                sprintf(buffer, "%s,%d,%d", nome, valore, idRicevuto);
+                messaggioOutput = creaMessaggio(buffer);
+                msgsnd(q2, messaggioOutput, strlen(messaggioOutput->data) + 1, IPC_NOWAIT);
+            }
+            else
+                printf("DB: query '%s' da IN%d non trovata\n", nomeRicevuto, idRicevuto);
+        }
+    }
+    msgctl(q1, IPC_RMID, NULL);
+    sprintf(buffer, "%s,%d,%d", "finito", valore, idRicevuto);
+    messaggioOutput = creaMessaggio(buffer);
+    msgsnd(q2, messaggioOutput, strlen(messaggioOutput->data) + 1, IPC_NOWAIT);
+
+    Nodo *ptr;
+    for (ptr = testa; testa != NULL; ptr = testa)
+    {
+        testa = testa->next;
+        free(ptr);
     }
 }
 
@@ -142,16 +219,26 @@ int main(int argc, char *argv[])
 
     if (fork() == 0)
     {
+        db(argv[1], q1, q2);
+        return 0;
+    }
+
+    if (fork() == 0)
+    {
         in(argv[2], q1, 1);
+        return 0;
     }
 
     if (fork() == 0)
     {
         in(argv[3], q1, 2);
+        return 0;
     }
 
     if (fork() == 0)
     {
-        db(argv[1], q1, q2);
+        out(q2);
+        return 0;
     }
+    sleep(1);
 }
