@@ -42,26 +42,6 @@ Nodo *cercaNodo(Nodo *testa, char *target)
 
 bool inserisci(Nodo **testa, char *data)
 {
-    printf("provo ad inserire %s\n", data);
-    if (cercaNodo(*testa, data) != NULL)
-        return false;
-    Nodo *nuovoNodo = (Nodo *)malloc(sizeof(Nodo));
-    strncpy(nuovoNodo->data, data, strlen(data) + 1);
-    nuovoNodo->next = NULL;
-    if (testa == NULL)
-        *testa = nuovoNodo;
-    else
-    {
-        Nodo *temp = *testa;
-        while (temp->next != NULL)
-            temp = temp->next;
-        temp->next = nuovoNodo;
-    }
-    return true;
-}
-
-bool inserisciInTesta(Nodo **testa, char *data)
-{
     if (cercaNodo(*testa, data) != NULL)
         return false;
     Nodo *nuovoNodo = (Nodo *)(malloc(sizeof(Nodo)));
@@ -111,25 +91,24 @@ Messaggio *creaMessaggio(char *input)
 bool fileExists(char *fileName)
 {
     struct stat fileStat;
-    if (stat(fileName, &fileStat) || !S_ISREG(fileStat.st_mode))
-        return false;
-    return true;
+    return !(stat(fileName, &fileStat) || !S_ISREG(fileStat.st_mode));
 }
 
+// Eliminiamo tutti i caratteri "spuri" dalla stringa in modo da ritornare solo le lettere
 char *trim(char *line)
 {
-    int cont = 0;
+    size_t i;
     char *trimmed = (char *)(malloc(MAX_BUF));
-    for (size_t i = 0; i < strlen(line); i++)
+    for (i = 0; i < strlen(line); i++)
     {
-        ++cont;
         if (isspace(line[i]) == 0)
             trimmed[i] = line[i];
     }
-    trimmed[cont + 1] = '\0';
+    trimmed[i + 1] = '\0';
     return trimmed;
 }
 
+// funzione di lettura
 void readFile(int q, char *fileName)
 {
     FILE *file;
@@ -143,7 +122,6 @@ void readFile(int q, char *fileName)
     while (!feof(file))
     {
         fgets(line, MAX_BUF, file);
-        // printf("%s\n", trim(line));
         msg = creaMessaggio(trim(line));
         msgsnd(q, msg, strlen(msg->data) + 1, IPC_NOWAIT);
     }
@@ -151,6 +129,7 @@ void readFile(int q, char *fileName)
     msgsnd(q, msg, strlen(msg->data) + 1, IPC_NOWAIT);
 }
 
+// funzione di output
 void writer(int pipe)
 {
     FILE *filePipe;
@@ -174,7 +153,7 @@ int main(int argc, char **argv)
 {
     Nodo *testa = NULL;
     FILE *filePipe;
-    int pipeD[2];
+    int pipeD[2]; // creo un array di int per il descrittore della pipe. [0] per lettura e [1] per scrittura
     int output;
     if (argc < 3)
     {
@@ -221,12 +200,11 @@ int main(int argc, char **argv)
         writer(pipeD[0]);
         return 0;
     }
-
+    // apro lo stream di scrittura della pipe e inizializzo variabili e strutture dati
     filePipe = fdopen(pipeD[1], "w");
     Messaggio msg;
     char *line;
     int eof = 0;
-    bool dupe;
     while (1)
     {
         msgrcv(msg_queue, &msg, sizeof(msg) - sizeof(long), 0, 0);
@@ -238,10 +216,10 @@ int main(int argc, char **argv)
             else
                 continue;
         }
-        dupe = inserisciInTesta(&testa, tolower_c(msg.data));
-        if (dupe)                                // se siamo in presenza di un duplicato, non inviamo alla pipe
-            fprintf(filePipe, "%s\n", msg.data); // inviamo alla pipe i dati non duplicati passati da R1 e R2
+        if (inserisci(&testa, tolower_c(msg.data))) // se siamo in presenza di un duplicato, non inviamo alla pipe
+            fprintf(filePipe, "%s\n", msg.data);    // inviamo alla pipe i dati non duplicati passati da R1 e R2
     }
+    // al termine dell'esecuzione di R1 e R2 inviamo a writer l'ultimo messaggio in pipe in modo da farlo terminare a sua volta
     fprintf(filePipe, "-finito-");
     msgctl(msg_queue, IPC_RMID, NULL);
     eliminaLista(testa);
