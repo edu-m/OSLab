@@ -40,22 +40,40 @@ Nodo *cercaNodo(Nodo *testa, char *target)
     return NULL;
 }
 
-bool inserisci(Nodo *testa, char *data)
+bool inserisci(Nodo **testa, char *data)
 {
     printf("provo ad inserire %s\n", data);
-    if (cercaNodo(testa, data) != NULL)
+    if (cercaNodo(*testa, data) != NULL)
         return false;
     Nodo *nuovoNodo = (Nodo *)malloc(sizeof(Nodo));
-    nuovoNodo->next = NULL;
     strncpy(nuovoNodo->data, data, strlen(data) + 1);
+    nuovoNodo->next = NULL;
     if (testa == NULL)
-        testa = nuovoNodo;
+        *testa = nuovoNodo;
     else
     {
-        Nodo *temp = testa;
+        Nodo *temp = *testa;
         while (temp->next != NULL)
             temp = temp->next;
         temp->next = nuovoNodo;
+    }
+    return true;
+}
+
+bool inserisciInTesta(Nodo **testa, char *data)
+{
+    if (cercaNodo(*testa, data) != NULL)
+        return false;
+    Nodo *nuovoNodo = (Nodo *)(malloc(sizeof(Nodo)));
+    strncpy(nuovoNodo->data, data, strlen(data) + 1);
+    nuovoNodo->next = NULL;
+
+    if (testa == NULL)
+        *testa = nuovoNodo;
+    else
+    {
+        nuovoNodo->next = *testa;
+        *testa = nuovoNodo;
     }
     return true;
 }
@@ -146,9 +164,9 @@ void writer(int pipe)
     while (1)
     {
         fgets(line, MAX_BUF, filePipe);
-        printf("Writer output: %s\n", line);
-        if (strncmp(line, "-finito-", strlen("-finito-") + 1) == 0) // riceviamo dati da P
+        if (strcmp(line, "-finito-") == 0) // riceviamo dati da P
             break;
+        printf("Writer output: %s", line);
     }
 }
 
@@ -220,10 +238,10 @@ int main(int argc, char **argv)
             else
                 continue;
         }
-        dupe = inserisci(testa, tolower_c(msg.data));
-        printf("%d %s\n", dupe, testa->data);
+        dupe = inserisciInTesta(&testa, tolower_c(msg.data));
+        printf("%d %s\n", dupe, msg.data);
         if (dupe)                              // se siamo in presenza di un duplicato, non inviamo alla pipe
-            fprintf(filePipe, "%s", msg.data); // inviamo alla pipe i dati non duplicati passati da R1 e R2
+            fprintf(filePipe, "%s\n", msg.data); // inviamo alla pipe i dati non duplicati passati da R1 e R2
     }
     fprintf(filePipe, "-finito-");
     // eliminaLista(testa);
