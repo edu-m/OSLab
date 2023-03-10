@@ -74,10 +74,9 @@ void eliminaLista(Nodo *testa)
 // Funzione per rendere stringa lowercase
 char *tolower_c(char *data)
 {
-    char *loweredString = (char *)malloc(MAX_BUF);
     for (size_t i = 0; i < strlen(data) + 1; i++)
-        loweredString[i] = tolower(data[i]);
-    return loweredString;
+        data[i] = tolower(data[i]);
+    return data;
 }
 
 /*
