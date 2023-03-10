@@ -239,11 +239,11 @@ int main(int argc, char **argv)
                 continue;
         }
         dupe = inserisciInTesta(&testa, tolower_c(msg.data));
-        printf("%d %s\n", dupe, msg.data);
-        if (dupe)                              // se siamo in presenza di un duplicato, non inviamo alla pipe
+        if (dupe)                                // se siamo in presenza di un duplicato, non inviamo alla pipe
             fprintf(filePipe, "%s\n", msg.data); // inviamo alla pipe i dati non duplicati passati da R1 e R2
     }
     fprintf(filePipe, "-finito-");
-    // eliminaLista(testa);
-    // fclose(filePipe);
+    msgctl(msg_queue, IPC_RMID, NULL);
+    eliminaLista(testa);
+    fclose(filePipe);
 }
