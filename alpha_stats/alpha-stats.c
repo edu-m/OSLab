@@ -65,7 +65,6 @@ void writeStats(int self_id, Charmem *cmem, Longmem *lmem, int idSem)
 
 void readFile(char *mfile, size_t size, struct charmem *mem, int idSem)
 {
-    int maxAL = 12;
     char *line;
     for (size_t i = 0; i < size; i++)
     {
@@ -82,7 +81,7 @@ void readFile(char *mfile, size_t size, struct charmem *mem, int idSem)
         }
         WAIT(idSem, P);
     }
-    // mem->eof = true;
+    mem->eof = true;
 }
 
 int main(int argc, char **argv)
