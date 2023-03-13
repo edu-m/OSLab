@@ -145,4 +145,13 @@ int main(int argc, char **argv)
 
     for (int i = 0; i < LONG_BUFSIZE; i++)
         printf("%c: %ld\n", (char)(65 + i), longmem->input[i]);
+
+    munmap(file, fileStat.st_size);
+
+    shmctl(s_charm, IPC_RMID, NULL);
+    shmctl(s_longm, IPC_RMID, NULL);
+
+    semctl(idSem, P, IPC_RMID);
+    semctl(idSem, AL, IPC_RMID);
+    semctl(idSem, MZ, IPC_RMID);
 }
