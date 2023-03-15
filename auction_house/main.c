@@ -89,7 +89,7 @@ void judge(Auction *mem, int semId, char *filename, int bidders)
             SIGNAL(semId, SEM_B);
             WAIT(semId, SEM_J);
         }
-        if (mem->id != -1)
+        if (mem->id != -1 && mem->curr_offer >= mem->min_offer)
             printf("Asta vinta da %d con offerta di %d\n", mem->id, mem->curr_offer);
         else
             printf("Asta non andata a buon fine\n");
@@ -108,7 +108,7 @@ void bidder(int id, Auction *mem, int idSem)
         WAIT(idSem, SEM_B);
         if (mem->finished)
             break;
-        int randomBid = getRandom(mem->min_offer, mem->max_offer);
+        int randomBid = getRandom(0, mem->max_offer);
         printf("ID %d: Offerta per %s da %d\n", id, mem->description, randomBid);
         if (mem->curr_offer < randomBid)
         {
