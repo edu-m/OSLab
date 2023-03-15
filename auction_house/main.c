@@ -94,10 +94,10 @@ void judge(Auction *mem, int semId, char *filename, int bidders)
         else
             printf("Asta non andata a buon fine\n");
     }
+    // comunica ai figli che non ci sono più aste
     mem->finished = true;
     for (int i = 0; i < bidders; i++)
         SIGNAL(semId, SEM_B);
-    exit(0);
 }
 
 void bidder(int id, Auction *mem, int idSem)
@@ -153,7 +153,7 @@ int main(int argc, char **argv)
         if (fork() == 0)
         {
             bidder(i, auc, idSem);
-            exit(0);
+            return 0;
         }
     }
     for (int i = 0; i < atoi(argv[2]); i++)
