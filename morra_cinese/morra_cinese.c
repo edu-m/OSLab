@@ -111,18 +111,17 @@ int get_sem_id()
 
 void giocatore(bool player_id, Gioco *gioco, int sem_id)
 {
-    srand(time(NULL) * player_id);
+    srand(time(NULL) * player_id + 2);
     char random_move;
     while (1)
     {
+        sleep(1);
         if (gioco->terminato)
             break;
         WAIT(sem_id, P);
         random_move = get_random_move();
-        printf("Mossa di %d: %c\n", player_id, random_move);
         gioco->mosse[player_id] = random_move;
         SIGNAL(sem_id, G);
-        sleep(1);
     }
 }
 
@@ -130,14 +129,14 @@ void giudice(Gioco *gioco, int sem_id)
 {
     while (1)
     {
-        sleep(1);
+        //sleep(1);
         if (gioco->terminato)
             break;
         WAIT(sem_id, G);
-        WAIT(sem_id, G);
+
         int vincitore = get_vincitore(gioco->mosse[0], gioco->mosse[1]);
         gioco->vincitore = vincitore;
-        if (vincitore == -1)
+        if (gioco->mosse[0] == gioco->mosse[1])
         {
             printf("Nessun vincitore\n");
             gioco->patta = true;
@@ -146,8 +145,16 @@ void giudice(Gioco *gioco, int sem_id)
         }
         else
         {
-            printf("Gioco terminato: %d\n", (gioco->terminato = (--gioco->games) == 0));
+            // printf("Gioco terminato: %d\n", (gioco->games == 0));
+
             gioco->patta = false;
+
+            if (gioco->games-- == 0)
+            {
+                gioco->terminato = true;
+                SIGNAL(sem_id, T);
+                break;
+            }
             SIGNAL(sem_id, T);
         }
     }
@@ -156,10 +163,13 @@ void giudice(Gioco *gioco, int sem_id)
 void tabellone(Gioco *gioco, int sem_id)
 {
     int vittorie[2] = {0, 0};
-    while (!gioco->terminato)
+    while (1)
     {
-        sleep(1);
+        if (gioco->terminato)
+            break;
+
         WAIT(sem_id, T);
+        sleep(1);
         ++vittorie[gioco->vincitore];
         printf("Vince %d!\n", gioco->vincitore);
         printf("Mossa di 0: %c\n", gioco->mosse[0]);
@@ -168,8 +178,8 @@ void tabellone(Gioco *gioco, int sem_id)
         printf("Punteggi: G1 %d G2 %d\n", vittorie[0], vittorie[1]);
         if (gioco->games > 0)
         {
-            printf("faccio signal su giocatore\n");
-            /// SIGNAL(sem_id, P);
+            SIGNAL(sem_id, P);
+            SIGNAL(sem_id, P);
         }
     }
 }
