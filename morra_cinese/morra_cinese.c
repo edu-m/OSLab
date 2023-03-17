@@ -116,7 +116,7 @@ void giocatore(bool player_id, Gioco *gioco, int sem_id)
 
     while (1)
     {
-        sleep(1);
+        usleep(75);
         if (gioco->terminato)
             break;
         WAIT(sem_id, P);
@@ -165,15 +165,15 @@ void tabellone(Gioco *gioco, int sem_id)
     {
         if (gioco->terminato)
         {
-            printf("Torneo terminato, vince G%d\n", (vittorie[0] < vittorie[1])+1);
+            printf("Torneo terminato, vince G%d\n", (vittorie[0] < vittorie[1]) + 1);
             break;
         }
         WAIT(sem_id, T);
         ++vittorie[gioco->vincitore];
-        printf("Vince %d!\n", gioco->vincitore);
+
         printf("Mossa di 0: %c\n", gioco->mosse[0]);
         printf("Mossa di 1: %c\n", gioco->mosse[1]);
-
+        printf("Vince %d!\n", gioco->vincitore);
         printf("Punteggi: G1 %d G2 %d\n", vittorie[0], vittorie[1]);
     }
 }
