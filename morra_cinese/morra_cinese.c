@@ -54,6 +54,7 @@ int get_vincitore(char g1, char g2)
     char mosse[3] = {'C', 'F', 'S'};
     if (g1 == g2)
         return -1;
+    // scorriamo l'array di mosse e se il destro di g1 è g2, allora vince g2
     if (mosse[((find_move(g1) + 1) % 3)] == g2)
         return 1;
     return 0;
@@ -61,7 +62,6 @@ int get_vincitore(char g1, char g2)
 
 char get_random_move()
 {
-
     char mosse[3] = {'C', 'F', 'S'};
     return mosse[rand() % 3];
 }
@@ -103,7 +103,7 @@ int get_sem_id()
 
 void giocatore(bool player_id, Gioco *gioco, int sem_id)
 {
-    srand(time(NULL) * player_id + 2);
+    srand(time(NULL) * (player_id + 1));
     char random_move;
 
     while (1)
@@ -135,17 +135,19 @@ void giudice(Gioco *gioco, int sem_id)
         }
         else
         {
-            // printf("Gioco terminato: %d\n", (gioco->games == 0));
             --gioco->games;
             gioco->patta = false;
 
-            if (gioco->games == 0)
-            {
-                gioco->terminato = true;
-                SIGNAL(sem_id, T);
-                break;
-            }
+            // if (gioco->games == 0)
+            // {
+            //     gioco->terminato = true;
+            //     SIGNAL(sem_id, T);
+            //     break;
+            // }
             SIGNAL(sem_id, T);
+            gioco->terminato = (gioco->games == 0);
+            if (gioco->terminato)
+                break;
         }
     }
 }
