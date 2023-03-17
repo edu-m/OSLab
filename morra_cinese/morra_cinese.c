@@ -129,27 +129,25 @@ void giudice(Gioco *gioco, int sem_id)
 {
     while (1)
     {
-        //sleep(1);
-        if (gioco->terminato)
-            break;
+        // sleep(1);
         WAIT(sem_id, G);
-
+        WAIT(sem_id, G);
         int vincitore = get_vincitore(gioco->mosse[0], gioco->mosse[1]);
         gioco->vincitore = vincitore;
+        SIGNAL(sem_id, P);
+        SIGNAL(sem_id, P);
         if (gioco->mosse[0] == gioco->mosse[1])
         {
             printf("Nessun vincitore\n");
             gioco->patta = true;
-            SIGNAL(sem_id, P);
-            SIGNAL(sem_id, P);
         }
         else
         {
             // printf("Gioco terminato: %d\n", (gioco->games == 0));
-
+            --gioco->games;
             gioco->patta = false;
 
-            if (gioco->games-- == 0)
+            if (gioco->games == 0)
             {
                 gioco->terminato = true;
                 SIGNAL(sem_id, T);
@@ -169,18 +167,13 @@ void tabellone(Gioco *gioco, int sem_id)
             break;
 
         WAIT(sem_id, T);
-        sleep(1);
+        // sleep(1);
         ++vittorie[gioco->vincitore];
         printf("Vince %d!\n", gioco->vincitore);
         printf("Mossa di 0: %c\n", gioco->mosse[0]);
         printf("Mossa di 1: %c\n", gioco->mosse[1]);
 
         printf("Punteggi: G1 %d G2 %d\n", vittorie[0], vittorie[1]);
-        if (gioco->games > 0)
-        {
-            SIGNAL(sem_id, P);
-            SIGNAL(sem_id, P);
-        }
     }
 }
 
