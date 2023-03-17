@@ -113,6 +113,7 @@ void giocatore(bool player_id, Gioco *gioco, int sem_id)
 {
     srand(time(NULL) * player_id + 2);
     char random_move;
+
     while (1)
     {
         sleep(1);
@@ -129,7 +130,6 @@ void giudice(Gioco *gioco, int sem_id)
 {
     while (1)
     {
-        // sleep(1);
         WAIT(sem_id, G);
         WAIT(sem_id, G);
         int vincitore = get_vincitore(gioco->mosse[0], gioco->mosse[1]);
@@ -164,10 +164,11 @@ void tabellone(Gioco *gioco, int sem_id)
     while (1)
     {
         if (gioco->terminato)
+        {
+            printf("Torneo terminato, vince G%d\n", (vittorie[0] < vittorie[1])+1);
             break;
-
+        }
         WAIT(sem_id, T);
-        // sleep(1);
         ++vittorie[gioco->vincitore];
         printf("Vince %d!\n", gioco->vincitore);
         printf("Mossa di 0: %c\n", gioco->mosse[0]);
