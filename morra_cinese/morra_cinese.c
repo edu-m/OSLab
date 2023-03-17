@@ -40,38 +40,30 @@ typedef struct morra_cinese
     bool terminato;
 } Gioco;
 
+int find_move(char move)
+{
+    char mosse[3] = {'C', 'F', 'S'};
+    for (int i = 0; i < 3; i++)
+        if (mosse[i] == move)
+            return i;
+    return -1;
+}
+
 int get_vincitore(char g1, char g2)
 {
+    char mosse[3] = {'C', 'F', 'S'};
     if (g1 == g2)
         return -1;
-    if (g1 == 'S')
-    {
-        if (g2 == 'C')
-            return 1;
-        else
-            return 0;
-    }
-    else if (g1 == 'C')
-    {
-        if (g2 == 'S')
-            return 0;
-        else
-            return 1;
-    }
-    else
-    {
-        if (g2 == 'S')
-            return 1;
-        else
-            return 0;
-    }
+    if (mosse[((find_move(g1) + 1) % 3)] == g2)
+        return 1;
+    return 0;
 }
 
 char get_random_move()
 {
 
-    char letters[3] = {'S', 'C', 'F'};
-    return letters[rand() % 3];
+    char mosse[3] = {'C', 'F', 'S'};
+    return mosse[rand() % 3];
 }
 
 void error(char *what)
@@ -116,7 +108,7 @@ void giocatore(bool player_id, Gioco *gioco, int sem_id)
 
     while (1)
     {
-        usleep(75);
+        usleep(60);
         if (gioco->terminato)
             break;
         WAIT(sem_id, P);
