@@ -116,15 +116,16 @@ void writer(Mem *mem, int sem_id)
     char line[MAX_BUF];
     while(1){
         WAIT(sem_id,W);
-        strcpy(line,mem->buffer);
+        // strcpy(line,mem->buffer);
+        fflush(stdout);
+        fprintf(stdout,"%s",mem->buffer);
         SIGNAL(sem_id,P);
         if(strcmp(line, "-finito-") == 0)
-            break;     
-        else 
         {
             fflush(stdout);
-            printf("%s",line);
-        }
+            fprintf(stdout,"\n");
+            break;
+        }  
     }
 }
 
