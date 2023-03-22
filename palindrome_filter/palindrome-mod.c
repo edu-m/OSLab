@@ -13,6 +13,7 @@
 #include <sys/msg.h>
 #include <sys/sem.h>
 #include <sys/shm.h>
+#include <sys/wait.h>
 #define MAX_BUF 32
 #define P 0
 #define W 1
@@ -119,13 +120,15 @@ void writer(Mem *mem, int sem_id)
         // strcpy(line,mem->buffer);
         fflush(stdout);
         fprintf(stdout,"%s",mem->buffer);
-        SIGNAL(sem_id,P);
+        
         if(strcmp(line, "-finito-") == 0)
         {
             fflush(stdout);
-            fprintf(stdout,"\n");
+            printf("finito\n");
+            SIGNAL(sem_id,P);
             break;
         }  
+        SIGNAL(sem_id,P);
     }
 }
 
@@ -136,11 +139,15 @@ int get_msgq(){
     return msg_q;
 }
 
-Mem *get_mem(){
+int get_mem_id()
+{
     int mem_id;
-    Mem *mem;
     if((mem_id = shmget(IPC_PRIVATE,sizeof(Mem),IPC_CREAT | 0660)) == -1)
         error("in shmget");
+}
+
+Mem *get_mem(int mem_id){
+    Mem *mem;
     if ((mem = (Mem*)shmat(mem_id,NULL,0)) == MAP_FAILED)
         error("in shmat");
     return mem;
@@ -165,7 +172,8 @@ int main(int argc, char **argv)
     if (!doesFileExist(argv[1], &file))
         error("file non trovato o non accessibile");
     
-    Mem *mem = get_mem();
+    int mem_id = get_mem_id();
+    Mem *mem = get_mem(mem_id);
     int sem_id = get_sem();
     int msg_q = get_msgq();
     
@@ -197,7 +205,12 @@ int main(int argc, char **argv)
         }
         SIGNAL(sem_id,W);
     }
-    // cancellazione strutture ipc
-
     
+    wait(NULL);
+    // wait(NULL);
+    // cancellazione strutture ipc
+    msgctl(msg_q,IPC_RMID,NULL);
+    shmctl(mem_id,IPC_RMID,NULL);
+    // semctl(sem_id,0,IPC_RMID);
+    return 0;
 } 
