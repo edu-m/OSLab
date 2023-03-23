@@ -108,6 +108,7 @@ void player(int id, int sem_id, Mem *mem){
             ++i;
         }
         mem->step[id] = i;
+        SIGNAL(sem_id,J);
     }
 }
 
