@@ -10,14 +10,21 @@
 #include <ctype.h>
 #include <sys/types.h>
 #define MAX_BUF 64
-#define MSG_BUF 16
 #define RAW 1
 #define DELTA 2
 
-typedef struct msg{
-    long mtype;
-    char data[MSG_BUF];
-}Msg;
+typedef struct {
+    long type;
+    int user;
+    int system;
+    int idle;
+} Raw_msg;
+
+typedef struct {
+    long type;
+    float user;
+    float system;
+} Delta_msg;
 
 void error(char *what){
     fprintf(stderr,"%s\n",what);
@@ -61,30 +68,79 @@ int *getValues(char *line){
 void sampler(int samples, int msg_q){
     FILE *stat;
     char *line;
-    Msg *tosend = (Msg*)malloc(sizeof(Msg));
+    Raw_msg tosend;
     
     for(int i=0;i<samples;i++){
         stat = fopen("/proc/stat","r");
         fgets(line,MAX_BUF,stat);
         int *data = getValues(line);
-        printf("%d %d %d\n",data[0], data[1], data[2]);
-        tosend->mtype = RAW;
-        sprintf(tosend->data,"%d;%d;%d", data[0], data[1], data[2]);
-        msgsnd(msg_q,tosend,strlen(tosend->data)+1,0);
+        //printf("%d %d %d\n",data[0], data[1], data[2]);
+        tosend.type = RAW;
+        tosend.user = data[0];
+        tosend.system = data[1];
+        tosend.idle = data[2];
+        printf("%d %d %d\n",tosend.user,tosend.system,tosend.idle);
+        //sprintf(tosend->data,"%d;%d;%d", data[0], data[1], data[2]);
+        if (msgsnd(msg_q, &tosend,sizeof(Raw_msg) - sizeof(tosend.type), 0) == -1)
+            perror("msgsnd");
         fclose(stat);
+        sleep(1);
     }
-    sprintf(tosend->data,"-1;-1;-1");
-    msgsnd(msg_q,tosend,strlen(tosend->data)+1,0);
+    tosend.user = -1.0;
+    tosend.system = -1.0;
+    tosend.idle = -1.0;
+    // sprintf(tosend->data,"-1;-1;-1");
+    msgsnd(msg_q,&tosend,sizeof(Raw_msg)-sizeof(long),0);
 }
 
 void analyzer(int msg_q){
-    Msg rcvd;
+    Raw_msg rcvd;
+    Delta_msg tosend;
     while(1){
-        msgrcv(msg_q,&rcvd,)
-        int first = atoi();
-        int second = atoi();
-        int third = atoi();
-        if(atoi())
+        if((msgrcv(msg_q,&rcvd,sizeof(Raw_msg) - sizeof(rcvd.type),RAW,0)) == -1)
+            perror("in msgrcv");
+        int user = rcvd.user;
+        if(user == -1)
+        {
+            tosend.type = DELTA;
+            tosend.user = -1.0;
+            // sprintf(tosend->data,"-1.0;-1.0");
+            msgsnd(msg_q,tosend,sizeof(Delta_msg)-sizeof(long),0);
+            break;
+        }
+        int system = atoi(strtok(NULL,";"));
+        int idle = atoi(strtok(NULL,";"));
+        int max = user+system+idle;
+        float user_perc = ((float)user / (float)max)*100;
+        float system_perc = ((float)system / (float)max)*100;
+        user_perc = (user_perc*6)/10;
+        system_perc = (system_perc*6)/10;
+        tosend->type = DELTA;
+        //sprintf(tosend->data,"%f;%f",user_perc,system_perc);
+        msgsnd(msg_q,tosend,sizeof(Delta_msg)-sizeof(long),0);
+    }
+}
+
+void plotter(int msg_q){
+    Delta_msg rcvd;
+    char plot[60];
+    char *stats;
+    while(1){
+        usleep(500);
+        memset(plot,'_',60);
+        msgrcv(msg_q,&rcvd,MAX_BUF,DELTA,0);
+
+        float system = rcvd.system;
+        float user = rcvd.user;
+        if(system == -1.0)
+            break;
+        for(int i=0;i<(int)user;i++)
+            plot[i] = '*';
+        for(int i=0;i<(int)system;i++)
+            plot[i] = '#';
+        
+        sprintf(stats,"s: %f u: %f",system,user);
+        printf("%s %s\n",plot, stats);
     }
 }
 
@@ -101,14 +157,14 @@ int main(int argc, char **argv){
         sampler(samples, msg_q);
         return 0;}
     if(fork() == 0) {
-        //analyzer(msg_q);
+        analyzer(msg_q);
         return 0;}
     if(fork() == 0) {
-        //plotter(msg_q);
+        plotter(msg_q);
         return 0;}
     // pulizia coda ipc
     wait(NULL);
     wait(NULL);
     wait(NULL);
-    msgctl(msg_q,IPC_RMID,NULL);
+    //msgctl(msg_q,IPC_RMID,NULL);
 }
