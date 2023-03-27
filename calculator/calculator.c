@@ -99,6 +99,19 @@ void op(int id, Mem* mem, int sem_id){
     }
 }
 
+char *trim(char *line)
+{
+    size_t i;
+    char *trimmed = (char *)(malloc(MAX_BUF));
+    for (i = 0; i < strlen(line); i++)
+    {
+        if (isspace(line[i]) == 0)
+            trimmed[i] = line[i];
+    }
+    trimmed[i + 1] = '\0';
+    return trimmed;
+}
+
 // enum SEM_TYPE {MNG = 0,ADD,MUL,SUB};
 
 void mng(int sem_id, Mem* mem, char* filename){
@@ -111,7 +124,7 @@ void mng(int sem_id, Mem* mem, char* filename){
         WAIT(sem_id,MNG);
         op = line[0];
         memmove (line, line+1, strlen(line+1) + 1);
-        printf("MNG: risultato intermedio: %ld; letto %s\n",mem->partial,line);
+        printf("MNG: risultato intermedio: %ld; letto %s\n",mem->partial,trim(line));
         mem->currop = atol(line);
         if(op == '+') target = 1;
         else if(op == '*') target = 2;
@@ -150,10 +163,10 @@ int main(int argc, char **argv){
         op(3,mem,sem_id);
         return 0;}
  
-
     wait(NULL);
     wait(NULL);
     wait(NULL);
     wait(NULL);
     shmctl(shm_id,IPC_RMID,NULL);
+    semctl(sem_id,0,IPC_RMID);
 }
