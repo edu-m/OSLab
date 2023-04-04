@@ -65,7 +65,7 @@ void error(char *what)
 
 void judge(Auction *mem, int semId, char *filename, int bidders)
 {
-    sleep(1);
+    usleep(100);
     FILE *file = fopen(filename, "r");
     char line[MAX_BUF];
     char *description;
@@ -105,6 +105,7 @@ void bidder(int id, Auction *mem, int idSem)
     srand(time(NULL) * id);
     while (1)
     {
+        usleep(700);
         WAIT(idSem, SEM_B);
         if (mem->finished)
             break;
@@ -129,8 +130,6 @@ int main(int argc, char **argv)
         error("il file selezionato non esiste o non è un file valido");
     // creo semafori e strutture ipc
     int idSem = semget(IPC_PRIVATE, 2, IPC_CREAT | 0660);
-    semctl(idSem, 0, SETVAL, 1);
-    semctl(idSem, 1, SETVAL, 0);
     int memseg_id = shmget(IPC_PRIVATE, sizeof(Auction), IPC_CREAT | 0660);
     if (memseg_id == -1)
         error("in allocazione memoria condivisa");

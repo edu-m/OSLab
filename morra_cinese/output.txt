@@ -1,0 +1,229 @@
+Nessun vincitore
+Nessun vincitore
+Nessun vincitore
+Nessun vincitore
+Nessun vincitore
+Nessun vincitore
+Nessun vincitore
+Nessun vincitore
+Nessun vincitore
+Nessun vincitore
+Nessun vincitore
+Nessun vincitore
+Nessun vincitore
+Nessun vincitore
+Nessun vincitore
+Nessun vincitore
+Nessun vincitore
+Nessun vincitore
+Nessun vincitore
+Nessun vincitore
+Nessun vincitore
+Nessun vincitore
+Nessun vincitore
+Nessun vincitore
+Nessun vincitore
+Nessun vincitore
+Nessun vincitore
+Nessun vincitore
+Mossa di 0: C
+Mossa di 1: S
+Vince 0!
+Punteggi: G1 1 G2 0
+Mossa di 0: F
+Mossa di 1: S
+Vince 1!
+Punteggi: G1 1 G2 1
+Mossa di 0: S
+Mossa di 1: C
+Vince 1!
+Punteggi: G1 1 G2 2
+Mossa di 0: S
+Mossa di 1: C
+Vince 1!
+Punteggi: G1 1 G2 3
+Mossa di 0: C
+Mossa di 1: F
+Vince 1!
+Punteggi: G1 1 G2 4
+Mossa di 0: C
+Mossa di 1: F
+Vince 1!
+Punteggi: G1 1 G2 5
+Mossa di 0: C
+Mossa di 1: S
+Vince 0!
+Punteggi: G1 2 G2 5
+Mossa di 0: C
+Mossa di 1: F
+Vince 1!
+Punteggi: G1 2 G2 6
+Mossa di 0: C
+Mossa di 1: S
+Vince 0!
+Punteggi: G1 3 G2 6
+Mossa di 0: C
+Mossa di 1: F
+Vince 1!
+Punteggi: G1 3 G2 7
+Mossa di 0: C
+Mossa di 1: F
+Vince 1!
+Punteggi: G1 3 G2 8
+Mossa di 0: S
+Mossa di 1: C
+Vince 1!
+Punteggi: G1 3 G2 9
+Mossa di 0: S
+Mossa di 1: F
+Vince 0!
+Punteggi: G1 4 G2 9
+Mossa di 0: C
+Mossa di 1: S
+Vince 0!
+Punteggi: G1 5 G2 9
+Mossa di 0: S
+Mossa di 1: F
+Vince 0!
+Punteggi: G1 6 G2 9
+Mossa di 0: C
+Mossa di 1: F
+Vince 1!
+Punteggi: G1 6 G2 10
+Mossa di 0: C
+Mossa di 1: S
+Vince 0!
+Punteggi: G1 7 G2 10
+Mossa di 0: S
+Mossa di 1: C
+Vince 1!
+Punteggi: G1 7 G2 11
+Mossa di 0: S
+Mossa di 1: F
+Vince 0!
+Punteggi: G1 8 G2 11
+Mossa di 0: S
+Mossa di 1: C
+Vince 1!
+Punteggi: G1 8 G2 12
+Mossa di 0: F
+Mossa di 1: C
+Vince 0!
+Punteggi: G1 9 G2 12
+Mossa di 0: F
+Mossa di 1: C
+Vince 0!
+Punteggi: G1 10 G2 12
+Mossa di 0: S
+Mossa di 1: C
+Vince 1!
+Punteggi: G1 10 G2 13
+Mossa di 0: C
+Mossa di 1: S
+Vince 0!
+Punteggi: G1 11 G2 13
+Mossa di 0: C
+Mossa di 1: S
+Vince 0!
+Punteggi: G1 12 G2 13
+Mossa di 0: C
+Mossa di 1: S
+Vince 0!
+Punteggi: G1 13 G2 13
+Mossa di 0: C
+Mossa di 1: F
+Vince 1!
+Punteggi: G1 13 G2 14
+Mossa di 0: S
+Mossa di 1: C
+Vince 1!
+Punteggi: G1 13 G2 15
+Mossa di 0: F
+Mossa di 1: S
+Vince 1!
+Punteggi: G1 13 G2 16
+Mossa di 0: C
+Mossa di 1: S
+Vince 0!
+Punteggi: G1 14 G2 16
+Mossa di 0: C
+Mossa di 1: F
+Vince 1!
+Punteggi: G1 14 G2 17
+Mossa di 0: S
+Mossa di 1: C
+Vince 1!
+Punteggi: G1 14 G2 18
+Mossa di 0: F
+Mossa di 1: C
+Vince 0!
+Punteggi: G1 15 G2 18
+Mossa di 0: S
+Mossa di 1: F
+Vince 0!
+Punteggi: G1 16 G2 18
+Mossa di 0: C
+Mossa di 1: F
+Vince 1!
+Punteggi: G1 16 G2 19
+Mossa di 0: C
+Mossa di 1: S
+Vince 0!
+Punteggi: G1 17 G2 19
+Mossa di 0: C
+Mossa di 1: S
+Vince 0!
+Punteggi: G1 18 G2 19
+Mossa di 0: S
+Mossa di 1: F
+Vince 0!
+Punteggi: G1 19 G2 19
+Mossa di 0: F
+Mossa di 1: S
+Vince 1!
+Punteggi: G1 19 G2 20
+Mossa di 0: F
+Mossa di 1: S
+Vince 1!
+Punteggi: G1 19 G2 21
+Mossa di 0: S
+Mossa di 1: F
+Vince 0!
+Punteggi: G1 20 G2 21
+Mossa di 0: S
+Mossa di 1: F
+Vince 0!
+Punteggi: G1 21 G2 21
+Mossa di 0: F
+Mossa di 1: C
+Vince 0!
+Punteggi: G1 22 G2 21
+Mossa di 0: C
+Mossa di 1: S
+Vince 0!
+Punteggi: G1 23 G2 21
+Mossa di 0: C
+Mossa di 1: F
+Vince 1!
+Punteggi: G1 23 G2 22
+Mossa di 0: S
+Mossa di 1: F
+Vince 0!
+Punteggi: G1 24 G2 22
+Mossa di 0: S
+Mossa di 1: F
+Vince 0!
+Punteggi: G1 25 G2 22
+Mossa di 0: F
+Mossa di 1: S
+Vince 1!
+Punteggi: G1 25 G2 23
+Mossa di 0: S
+Mossa di 1: F
+Vince 0!
+Punteggi: G1 26 G2 23
+Mossa di 0: F
+Mossa di 1: S
+Vince 1!
+Punteggi: G1 26 G2 24
+Torneo terminato, vince G1

@@ -2,3 +2,5 @@ farinella
 cutello
 pavone
 santoro
+furnari
+Pappalardo

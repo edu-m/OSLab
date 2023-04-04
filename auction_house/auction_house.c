@@ -140,14 +140,14 @@ int main(int argc,char *argv[]){
         printf("J Lancio asta n.%d per %s con minimo %d EURO e massimo %d EURO\n",ac,obj,min_offer,max_offer);
         //Riceve i messaggi dai bidders, salva le loro offerte 
         
-         while(bids < num_bidders){
-            msgrcv(msg_des,&receive,MAX_BUF,J,0);
-            ++bids;
-            id_bidder=atoi(strtok(receive.buffer,","));
-            offer_bidder=atoi(strtok(NULL,"\n"));
-            printf("Il processo B%d offre %d EURO\n",id_bidder+1,offer_bidder);
-            offers[id_bidder]=offer_bidder; 
-         }
+        while(bids < num_bidders){
+           msgrcv(msg_des,&receive,MAX_BUF,J,0);
+           ++bids;
+           id_bidder=atoi(strtok(receive.buffer,","));
+           offer_bidder=atoi(strtok(NULL,"\n"));
+           printf("Il processo B%d offre %d EURO\n",id_bidder+1,offer_bidder);
+           offers[id_bidder]=offer_bidder; 
+        }
          //Decide il vincitore dell'asta
         //  printf("Tutte le offerte per l'asta %d sono state ricevute\n",ac);
          id_bidder=get_winner(offers,min_offer,num_bidders);

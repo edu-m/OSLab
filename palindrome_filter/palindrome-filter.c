@@ -23,14 +23,26 @@ bool isPalindrome(char *word){
     return true;
 }
 
+FILE *pipeHandler(int *pipe, char *perm){
+    if(perm == "r")
+        {
+            close(pipe[1]);
+            return fdopen(pipe[0],perm);
+        }
+    close(pipe[0]);
+    return fdopen(pipe[1],perm);
+}
+
+
 char *trim(char *line)
 {
     size_t i;
+    size_t j=0;
     char *trimmed = (char *)(malloc(MAX_BUF));
     for (i = 0; i < strlen(line); i++)
     {
-        if (isspace(line[i]) == 0)
-            trimmed[i] = line[i];
+        if (!isspace(line[i]))
+            trimmed[j++] = line[i];
     }
     trimmed[i + 1] = '\0';
     return trimmed;
@@ -52,7 +64,8 @@ bool doesFileExist(char *filename, struct stat* file)
 void reader(char *filename, struct stat *file, int pipeDes_r)
 {
     // close(pipeDes_r[0]);
-    FILE *fpipe_r = fdopen(pipeDes_r, "w");
+    // FILE *fpipe_r = fdopen(pipeDes_r, "w");
+    FILE *fpipe_r = pipeHandler(pipeDes_r, "w");
     int file_des = open(filename, O_RDONLY);
     char *lines;
     lines = (char*)mmap(NULL,file->st_size,PROT_READ,MAP_SHARED,file_des,0);
@@ -78,11 +91,11 @@ void reader(char *filename, struct stat *file, int pipeDes_r)
     fprintf(fpipe_r,"-finito-");
 }
 
-
 void writer(int *pipeDes_w)
 {
-     close(pipeDes_w[1]);
-    FILE *fpipe_w = fdopen(pipeDes_w[0], "r");
+    // close(pipeDes_w[1]);
+    // FILE *fpipe_w = fdopen(pipeDes_w[0], "r");
+    FILE *fpipe_w = pipeHandler(pipeDes_w, "r");
     char line[MAX_BUF];
    
     while(1){
@@ -90,7 +103,6 @@ void writer(int *pipeDes_w)
         printf("%s",line);
         if(strcmp(line, "-finito-") == 0)
             break;
-        
     }
 }
 
@@ -115,10 +127,10 @@ int main(int argc, char **argv)
         return 0;
     }
     if (fork() == 0)
-        {
-            writer(pipeDes_w);
-            return 0;
-        }
+    {
+        writer(pipeDes_w);
+        return 0;
+    }
 
     FILE *fpipe_r = fdopen(pipeDes_r[0], "r");
     FILE *fpipe_w = fdopen(pipeDes_w[1], "w");

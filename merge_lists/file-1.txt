@@ -2,3 +2,7 @@ faro
 santoro
 riccobene
 tramontana
+barbanera
+cutello
+stanco
+pappalardo

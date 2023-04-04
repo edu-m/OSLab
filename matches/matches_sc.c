@@ -159,19 +159,15 @@ void out(int msg_des,int sem_des,shm_data *mem){
         v=atoi(strtok(NULL,","));
         t=atoi(strtok(NULL,"\n"));
         
-        if(t != 0)
-    {    if(v==1)
+    if(t != 0)
+    {
+        if(v==1)
              printf("%d: Vince P1 con %d su P2 con %d rispetto al target %d\n",k,m1,m2,t);
         else
              printf("%d: Vince P2 con %d su P1 con %d rispetto al target %d\n",k,m2,m1,t);}
-        
-        SIGNAL(sem_des,J);
-            
+        SIGNAL(sem_des,J);       
     }
-
-
 }
-
 
 int main(int argc, char *argv[]){
     if(argc<2)

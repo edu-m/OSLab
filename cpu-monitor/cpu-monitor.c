@@ -105,7 +105,7 @@ void analyzer(int msg_q){
             tosend.type = DELTA;
             tosend.user = -1.0;
             // sprintf(tosend->data,"-1.0;-1.0");
-            msgsnd(msg_q,tosend,sizeof(Delta_msg)-sizeof(long),0);
+            msgsnd(msg_q,&tosend,sizeof(Delta_msg)-sizeof(long),0);
             break;
         }
         int system = atoi(strtok(NULL,";"));
@@ -115,9 +115,9 @@ void analyzer(int msg_q){
         float system_perc = ((float)system / (float)max)*100;
         user_perc = (user_perc*6)/10;
         system_perc = (system_perc*6)/10;
-        tosend->type = DELTA;
+        tosend.type = DELTA;
         //sprintf(tosend->data,"%f;%f",user_perc,system_perc);
-        msgsnd(msg_q,tosend,sizeof(Delta_msg)-sizeof(long),0);
+        msgsnd(msg_q,&tosend,sizeof(Delta_msg)-sizeof(long),0);
     }
 }
 

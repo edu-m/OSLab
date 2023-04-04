@@ -210,7 +210,7 @@ void db(char *path,int shm_des_dbin,int shm_des_dbout,int sem_des, Node *testa, 
         SIGNAL(sem_des,OUT);
         SIGNAL(sem_des,IN);
         }
-         if(mem_dbin->terminated == num)
+            if(mem_dbin->terminated == num)
         break;
     }
 

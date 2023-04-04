@@ -24,7 +24,7 @@ int SIGNAL(int sem_des, int num_semaforo)
     return semop(sem_des, operazioni, 1);
 }
 
-enum SEM_TYPE {MNG = 0,ADD = 1,MUL = 2,SUB = 3};
+enum SEM_TYPE {MNG = 0, ADD, MUL, SUB};
 
 typedef struct shm{
     long currop;
@@ -82,19 +82,18 @@ void op(int id, Mem* mem, int sem_id){
             break;
         switch(id){
             case ADD:
-                printf("ADD: %ld + %ld\n",mem->partial,mem->currop);
+                printf("ADD: %ld+%ld\n",mem->partial,mem->currop);
                 mem->partial+=mem->currop;
                 break;
             case MUL:
-                printf("MUL: %ld * %ld\n",mem->partial,mem->currop);
+                printf("MUL: %ld*%ld\n",mem->partial,mem->currop);
                 mem->partial*=mem->currop;
                 break;
             case SUB:
-                printf("SUB: %ld - %ld\n",mem->partial,mem->currop);
+                printf("SUB: %ld-%ld\n",mem->partial,mem->currop);
                 mem->partial-=mem->currop;
                 break;
         }
-        
         SIGNAL(sem_id,MNG);
     }
 }
@@ -104,18 +103,20 @@ char *trim(char *line)
     size_t i;
     char *trimmed = (char *)(malloc(MAX_BUF));
     for (i = 0; i < strlen(line); i++)
-    {
         if (isspace(line[i]) == 0)
             trimmed[i] = line[i];
-    }
     trimmed[i + 1] = '\0';
     return trimmed;
 }
 
 // enum SEM_TYPE {MNG = 0,ADD,MUL,SUB};
 
+void shift_line(char *input){
+    for(int i=0;i<strlen(input);i++)
+        input[i] = input[i+1];
+}
+
 void mng(int sem_id, Mem* mem, char* filename){
-    usleep(500);
     FILE *file = fopen(filename,"r");
     char line[MAX_BUF];
     char op;
@@ -123,12 +124,13 @@ void mng(int sem_id, Mem* mem, char* filename){
     while(fgets(line,MAX_BUF,file)){
         WAIT(sem_id,MNG);
         op = line[0];
-        memmove (line, line+1, strlen(line+1) + 1);
+        //memmove (line, &line[1], strlen(line));
+        shift_line(line);
         printf("MNG: risultato intermedio: %ld; letto %s\n",mem->partial,trim(line));
         mem->currop = atol(line);
-        if(op == '+') target = 1;
-        else if(op == '*') target = 2;
-        else if(op == '-') target = 3;
+        if(op == '+')      target = ADD;
+        else if(op == '*') target = MUL;
+        else if(op == '-') target = SUB;
         // printf("sveglio %d\n",target);
         SIGNAL(sem_id,target);
     }
@@ -148,6 +150,7 @@ int main(int argc, char **argv){
     int shm_id = get_shm_id();
     Mem* mem = get_shm_mem(shm_id);
     mem->partial=0;
+    mem->eof = false;
     int sem_id = get_sem();
 
    if(fork() == 0){

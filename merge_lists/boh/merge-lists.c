@@ -40,20 +40,20 @@ Nodo *cercaNodo(Nodo *testa, char *target)
     return NULL;
 }
 
-bool inserisci(Nodo *testa, char *data)
+bool inserisci(Nodo **testa, char *data)
 {
-    if (cercaNodo(testa, data) != NULL)
+    if (cercaNodo(*testa, data) != NULL)
         return false;
     Nodo *nuovoNodo = (Nodo *)(malloc(sizeof(Nodo)));
     strncpy(nuovoNodo->data, data, strlen(data) + 1);
     nuovoNodo->next = NULL;
 
     if (testa == NULL)
-        testa = nuovoNodo;
+        *testa = nuovoNodo;
     else
     {
-        nuovoNodo->next = testa;
-        testa = nuovoNodo;
+        nuovoNodo->next = *testa;
+        *testa = nuovoNodo;
     }
     return true;
 }
@@ -216,7 +216,7 @@ int main(int argc, char **argv)
             else
                 continue;
         }
-        if (inserisci(testa, tolower_c(msg.data))) // se siamo in presenza di un duplicato, non inviamo alla pipe
+        if (inserisci(&testa, tolower_c(msg.data))) // se siamo in presenza di un duplicato, non inviamo alla pipe
             fprintf(filePipe, "%s\n", msg.data);    // inviamo alla pipe i dati non duplicati passati da R1 e R2
     }
     // al termine dell'esecuzione di R1 e R2 inviamo a writer l'ultimo messaggio in pipe in modo da farlo terminare a sua volta

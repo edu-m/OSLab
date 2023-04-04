@@ -117,17 +117,14 @@ void writer(Mem *mem, int sem_id)
     char line[MAX_BUF];
     while(1){
         WAIT(sem_id,W);
-        // strcpy(line,mem->buffer);
-        fflush(stdout);
-        fprintf(stdout,"%s",mem->buffer);
-        
+        strcpy(line,mem->buffer);
         if(strcmp(line, "-finito-") == 0)
         {
-            fflush(stdout);
-            printf("finito\n");
             SIGNAL(sem_id,P);
             break;
         }  
+        else 
+            printf("\n%s",line);
         SIGNAL(sem_id,P);
     }
 }
@@ -191,6 +188,7 @@ int main(int argc, char **argv)
     Message rcvd_msg;
     char *trimmedline;
     while(1){
+        fflush(stdout);
         msgrcv(msg_q,&rcvd_msg,MAX_BUF,0,0);
         WAIT(sem_id,P);
         trimmedline = trim(rcvd_msg.buffer);
@@ -205,12 +203,12 @@ int main(int argc, char **argv)
         }
         SIGNAL(sem_id,W);
     }
-    
     wait(NULL);
     // wait(NULL);
     // cancellazione strutture ipc
     msgctl(msg_q,IPC_RMID,NULL);
     shmctl(mem_id,IPC_RMID,NULL);
     // semctl(sem_id,0,IPC_RMID);
+    
     return 0;
 } 
